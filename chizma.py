@@ -38,7 +38,7 @@ bulut4.move(-60,30)
 obj4.setOutline("black")
 
 
-kolmak.setOutline("Blue")
+kolmak.setOutline("White")
 
 tonka.setOutline("black")
 
@@ -50,7 +50,7 @@ obj3.setOutline("blue")
 
 obj.setOutline("black")
 
-obj4.setFill("green")
+obj4.setFill("yellow")
 
 tonka.setFill("brown")
 
