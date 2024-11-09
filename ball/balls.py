@@ -15,38 +15,33 @@ class Ball():
 		self.coord =list(coord)
 		if color == None:
 			color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
-		
 		self.color = color
-		
-		self.rad = rad
-		self.image = pygame.draw.circle(screen,self.color,self.coord,self.rad)
-		
+		self.rad = rad	
 		self.vx =	random.randint(-10,10)
 		self.vy = random.randint(-10,10)
 
 	def update(self):
-		self.coord[0] += self.vx
-		self.coord[1] += self.vy
+        self.image = pygame.draw.circle(screen, self.color, self.coord, self.rad)
+        self.coord[0] += self.vx
+        self.coord[1] += self.vy
 
 		if self.coord[0]<0 or self.coord[0] + self.rad*2>800:
 			self.vx = -self.vx
 		if self.coord[1] < 0 or self.coord[1] + self.rad*2 >600:
 			self.vy = -self.vy
-
 balls=[]
 for i in range(10):
 	ball = Ball()
 	balls.append(ball)
-	
-	
 
-runing = True
-while runing:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			runing = False
-	for ball in balls:
-        ball.update()
-        screen.blit(ball.image, ball.coord)
-	pygame.display.flip()
-pygame.QUIT
+
+running = True
+while running:
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+      runing = False
+  # Correct indentation (assuming 2 spaces)
+  for ball in balls:
+    ball.update()
+    screen.blit(ball.image, ball.coord)
+  pygame.display.flip()
