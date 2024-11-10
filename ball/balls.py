@@ -50,9 +50,11 @@ class Ball():
 		 	self.y = 0
 		 	self.vy = -self.vy
 		 elif self.y + self.rad * 2 > 600:
+
 		 	self.x = random.randint(self.rad, 800 - self.rad)
+		 	self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
 		 	self.y = 600 - self.rad * 2
-		 	self.y = 0
+		 	self.y = self.rad /100
 		 	self.vy = +self.vy
 
 balls = [Ball(None,None) for i in range(6)]
