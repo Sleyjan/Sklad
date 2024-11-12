@@ -7,8 +7,27 @@ screen = pygame.display.set_mode((800,600))
 clock = pygame.time.Clock()
 fps = 60
 
+class Triangle():
+	def __init__(self,x,y,color= None):
+
+		self.x = x
+		self.y = y 
+		if color == None:
+
+			color = ((12,120,50))
+		self.color = color
+
+		self.image = pygame.Surface((100,100),pygame.SRCALPHA)
+
+		pygame.draw.polygon(self.image, self.color, [[100 , 600], [120, 550], [140, 600]] )
+
+		def moving(self):
+
+            pass
+
+
 class Ball():
-	def __init__(self,x,y,color= None,rad=30):
+	def __init__(self,x,y,color= None,rad=22):
 
 		self.rad = rad
 
@@ -32,8 +51,8 @@ class Ball():
 
 	def update(self):
         
-		 friction = 1  # Adjust for desired friction level (0 to 1)
-		 self.vx *= friction 
+		 friction = 1 
+		 # self.vx *= friction 
 		 self.vy *= friction
 		 #self.x += self.vx
 		 self.y += self.vy
@@ -57,7 +76,7 @@ class Ball():
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
 
-balls = [Ball(None,None) for i in range(6)]
+balls = [Ball(None,None) for i in range(8)]
 running = True
 while running:
   for event in pygame.event.get():
@@ -69,6 +88,9 @@ while running:
   for ball in balls:
     ball.update()
     screen.blit(ball.image,(ball.x,ball.y))
+
+
+  screen.blit(Triangle.image,(Triangle.x,Triangle.y))
 
   pygame.display.flip()
 
