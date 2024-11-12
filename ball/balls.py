@@ -7,23 +7,22 @@ screen = pygame.display.set_mode((800,600))
 clock = pygame.time.Clock()
 fps = 60
 
-class Triangle():
+class puwka():
 	def __init__(self,x,y,color= None):
 
 		self.x = x
 		self.y = y 
 		if color == None:
 
-			color = ((12,120,50))
+			color = ((0,255,0))
 		self.color = color
 
-		self.image = pygame.Surface((100,100),pygame.SRCALPHA)
+		self.image = pygame.Surface((100,600),pygame.SRCALPHA)
 
-		pygame.draw.polygon(self.image, self.color, [[100 , 600], [120, 550], [140, 600]] )
+		pygame.draw.polygon(self.image, self.color, [[0 ,100], [35,50], [70,100]] )
 
 		def moving(self):
-
-            pass
+			pass
 
 
 class Ball():
@@ -76,6 +75,9 @@ class Ball():
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
 
+
+puwka_object = puwka(400,495)
+
 balls = [Ball(None,None) for i in range(8)]
 running = True
 while running:
@@ -87,10 +89,13 @@ while running:
 
   for ball in balls:
     ball.update()
+
     screen.blit(ball.image,(ball.x,ball.y))
 
+  screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
 
-  screen.blit(Triangle.image,(Triangle.x,Triangle.y))
+
+  
 
   pygame.display.flip()
 
