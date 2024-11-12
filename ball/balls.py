@@ -8,21 +8,44 @@ clock = pygame.time.Clock()
 fps = 60
 
 class puwka():
-	def __init__(self,x,y,color= None):
+	def __init__(self,x,y,color= None,left = False,right = False):
 
+		self.left = left
+		self.right = right
 		self.x = x
 		self.y = y 
 		if color == None:
 
-			color = ((0,255,0))
+			color = ((255,0,0))
 		self.color = color
 
 		self.image = pygame.Surface((100,600),pygame.SRCALPHA)
 
 		pygame.draw.polygon(self.image, self.color, [[0 ,100], [35,50], [70,100]] )
+		self.speed = 20
 
-		def moving(self):
-			pass
+
+	def border_control(self):
+
+		if self.x < 0:
+			self.x= 0
+		elif self.x + self.image.get_width() > 800:
+			self.x = 800 - self.image.get_width() 
+
+
+
+	def control(self):
+
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_LEFT:
+				self.x -=  self.speed
+			if event.key == pygame.K_RIGHT:
+				self.x  += self.speed 
+
+
+
+
+
 
 
 class Ball():
@@ -84,6 +107,9 @@ while running:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       running = False
+    puwka_object.control()
+
+  puwka_object.border_control()
  	
   screen.fill((0,0,0))
 
