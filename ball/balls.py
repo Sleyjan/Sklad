@@ -33,7 +33,6 @@ class puwka():
 			self.x = 800 - self.image.get_width() 
 
 
-
 	def control(self):
 
 		if event.type == pygame.KEYDOWN:
@@ -42,9 +41,25 @@ class puwka():
 			if event.key == pygame.K_RIGHT:
 				self.x  += self.speed 
 
+class Pulya(puwka):
+	def __init__(self,x,y,color = None,left=False,right=False,rad=1):
+		super().__init__(x,y)
+		self.rad = rad
+		self.right = right
+		self.left = left 
+		self.x = x 
+		self.y = y 
+		if color == None:
+			color = ((255,5,5))
+		self.color = color
+		self.speed = 20
+		self.mvspeed = 20
+		self.image = pygame.Surface((100,600),pygame.SRCALPHA)
+		pygame.draw.circle(self.image,self.color,(self.rad,self.rad),self.rad)
 
+		def update():
 
-
+			pass
 
 
 
@@ -98,7 +113,7 @@ class Ball():
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
 
-
+pulya_object =Pulya(435,550)
 puwka_object = puwka(400,495)
 
 balls = [Ball(None,None) for i in range(8)]
@@ -108,7 +123,7 @@ while running:
     if event.type == pygame.QUIT:
       running = False
     puwka_object.control()
-
+    pulya_object.control()
   puwka_object.border_control()
  	
   screen.fill((0,0,0))
@@ -119,7 +134,7 @@ while running:
     screen.blit(ball.image,(ball.x,ball.y))
 
   screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
-
+  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
 
   
 
