@@ -42,18 +42,23 @@ class puwka():
 				self.x  += self.speed 
 
 class Pulya(puwka):
-	def __init__(self,x,y,color = None,left=False,right=False,rad=5):
-		super().__init__(x,y,color,left,right)
+	def __init__(self,x,y,color = None,rad=5,Shoot= False):
+		super().__init__(x,y,color,Shoot)
 		self.rad = rad
-		self.right = right
-		self.left = left 
 		self.x = x 
 		self.y = y 
+		self.Shoot = Shoot
 		if color == None:
 			color = ((255,5,5))
 		self.color = color
 		self.speed = 20
-		self.mvspeed = 20
+		self.mvspeed = 30
+
+	def vistrel(self):
+		if self.Shoot:
+			self.y -= self.mvspeed
+
+	  
 		self.image = pygame.Surface((self.rad*2,self.rad*2),pygame.SRCALPHA)
 		pygame.draw.circle(self.image,self.color,(self.rad,self.rad),self.rad)
 
@@ -61,10 +66,10 @@ class Pulya(puwka):
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE:
-			  self.y -= self.mvspeed
-
-
-
+				self.Shoot = True
+				if self.y <0:
+					self.Shoot = False
+			   
 class Ball():
 	def __init__(self,x,y,color= None,rad=22):
 
@@ -115,7 +120,7 @@ class Ball():
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
 
-pulya_object =Pulya(435,550)
+pulya_object =Pulya(430,550)
 puwka_object = puwka(400,495)
 
 balls = [Ball(None,None) for i in range(8)]
@@ -127,8 +132,7 @@ while running:
     puwka_object.control()
     pulya_object.control()
     pulya_object.update()
-
-
+  pulya_object.vistrel()
   puwka_object.border_control()
  	
   screen.fill((0,0,0))
