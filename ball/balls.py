@@ -3,15 +3,42 @@ import random
 pygame.init()
 screen = pygame.display.set_mode((800,600))
 clock = pygame.time.Clock()
-fps = 60
+fps = 45
 b=1
 counter = 0
+
 def counter_round():
-	global b
+	global b,fps
 	b +=1
+	fps +=5  
 	if b == 5:
 		print('Game Finished')
 
+class Sound():
+	def __init__(self,sound):
+		self.sound = sound
+
+	def pulya_sound(self):
+		 	self.sound = pygame.mixer.Sound("pulya.mp3")
+		 	self.sound.set_volume(0.5)
+		 	self.sound.play()
+
+	def destroyed_ball(self):
+		self.sound = pygame.mixer.Sound("puzir.mp3")
+		self.sound.set_volume(1)
+		self.sound.play()
+
+	def new_raund_sound(self):
+
+		self.sound = pygame.mixer.Sound("smena1.mp3")
+		self.sound.set_volume(1)
+		self.sound.play()
+
+	def move_object(self):
+
+		self.sound = pygame.mixer.Sound("move.mp3")
+		self.sound.set_volume(0.5)
+		self.sound.play()
 
 class Write():
 	def __init__(self,color = None,font =(None,32),text = None):
@@ -58,7 +85,7 @@ class puwka():
 		self.image = pygame.Surface((100,600),pygame.SRCALPHA)
 
 		pygame.draw.polygon(self.image, self.color, [[0 ,100], [35,50], [70,100]] )
-		self.speed = 20
+		self.speed = 30
 
 
 	def border_control(self):
@@ -68,14 +95,15 @@ class puwka():
 		elif self.x + self.image.get_width() > 800:
 			self.x = 820 - self.image.get_width()
 
-
 	def control(self):
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LEFT:
 				self.x -=  self.speed
+				sound_object.move_object()
 			if event.key == pygame.K_RIGHT:
 				self.x  += self.speed 
+				sound_object.move_object()
 
 class Pulya(puwka):
 	def __init__(self,x,y,color = None,rad=5,Shoot= False):
@@ -87,8 +115,8 @@ class Pulya(puwka):
 		if color == None:
 			color = ((255,5,5))
 		self.color = color
-		self.speed = 20
-		self.mvspeed = 30
+		self.speed = 30
+		self.mvspeed = 22
 		self.image = pygame.Surface((self.rad*2,self.rad*2),pygame.SRCALPHA)
 		pygame.draw.circle(self.image,self.color,(self.rad,self.rad),self.rad)
 		
@@ -112,11 +140,13 @@ class Pulya(puwka):
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE:
 				self.Shoot = True
-		self.rect = pygame.Rect(self.x,self.y,self.rad,self.rad)
+				sound_object.pulya_sound()
+		self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 		for ball in balls:
 			if self.rect.colliderect(ball.rect):
 				balls.remove(ball)
 				counter +=1
+				sound_object.destroyed_ball()
 			   
 class Ball():
 	def __init__(self,x,y,color= None,rad=22):
@@ -157,6 +187,7 @@ class Ball():
 		 	self.vy = +self.vy
 		 	self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
+sound_object = Sound(None)
 write_object = Write()
 pulya_object = Pulya(430,550)
 puwka_object = puwka(400,495)
@@ -181,8 +212,10 @@ while running:
     pulya_object.update()
   for ball in balls:
    	ball.update()
-  for ball in balls:
+  for ball in balls.copy():
   	if pulya_object.rect.colliderect(ball.rect):
+  		counter +=1
+  		sound_object.destroyed_ball()
 
   		balls.remove(ball)
 
@@ -209,9 +242,7 @@ while running:
   if len(balls) == 0:
   	counter_round()  
   	new_raund() 
- 	
-  print(len(balls))
-
+  	sound_object.new_raund_sound()
   pygame.display.flip()
 
   clock.tick(fps)
