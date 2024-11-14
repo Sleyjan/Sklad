@@ -30,7 +30,7 @@ class puwka():
 		if self.x < 0:
 			self.x= 0
 		elif self.x + self.image.get_width() > 800:
-			self.x = 800 - self.image.get_width() 
+			self.x = 820 - self.image.get_width()
 
 
 	def control(self):
@@ -42,10 +42,8 @@ class puwka():
 				self.x  += self.speed 
 
 class Pulya(puwka):
-	def __init__(self,x,y,color = None,rad=5,Shoot= False,qty=None):
-		super().__init__(x,y,color,Shoot,qty)
-		qty = []
-		self.qty = qty
+	def __init__(self,x,y,color = None,rad=5,Shoot= False):
+		super().__init__(x,y,color,Shoot)
 		self.rad = rad
 		self.x = x 
 		self.y = y 
@@ -58,14 +56,9 @@ class Pulya(puwka):
 		self.image = pygame.Surface((self.rad*2,self.rad*2),pygame.SRCALPHA)
 		pygame.draw.circle(self.image,self.color,(self.rad,self.rad),self.rad)
 		
-
-
-
 	def vistrel(self):
 
-
 		if self.Shoot:
-
 			self.y -= self.mvspeed
 
 		if self.y < 0:
@@ -73,13 +66,24 @@ class Pulya(puwka):
 			self.Shoot = False
 
 
+	def pulya_border_control(self):
+		if self.x < 30:
+			self.x = 30
+		if self.x >750:
+			self.x = 750
+
+
+
 	def update(self):
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE:
 				self.Shoot = True
-				
-					
+		self.rect = pygame.Rect(self.x,self.y,self.rad,self.rad)
+		for ball in balls:
+			if self.rect.colliderect(ball.rect):
+				balls.remove(ball)
+
 			   
 class Ball():
 	def __init__(self,x,y,color= None,rad=22):
@@ -104,6 +108,8 @@ class Ball():
 
 		self.y = y if x and y else random.randint(self.rad, 600 - self.rad)
 
+		self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
+
 	def update(self):
         
 		 friction = 1 
@@ -111,7 +117,6 @@ class Ball():
 		 self.vy *= friction
 		 #self.x += self.vx
 		 self.y += self.vy
-
         
 		 #if self.x < 0:
 		 #	self.x = 0
@@ -126,16 +131,19 @@ class Ball():
 		 elif self.y + self.rad * 2 > 600:
 
 		 	self.x = random.randint(self.rad, 800 - self.rad)
-		 	self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
 		 	self.y = 600 - self.rad * 2
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
+		 	
+		 	self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
 pulya_object =Pulya(430,550)
 puwka_object = puwka(400,495)
 
 balls = [Ball(None,None) for i in range(8)]
+
 running = True
+
 while running:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
@@ -143,9 +151,19 @@ while running:
     puwka_object.control()
     pulya_object.control()
     pulya_object.update()
+  for ball in balls:
+   	ball.update()
+  for ball in balls:
+  	if pulya_object.rect.colliderect(ball.rect):
+
+  		balls.remove(ball)
+
   pulya_object.vistrel()
+
   puwka_object.border_control()
- 	
+
+  pulya_object.pulya_border_control()
+
   screen.fill((0,0,0))
 
   for ball in balls:
