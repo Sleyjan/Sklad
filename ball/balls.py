@@ -2,10 +2,35 @@ import pygame
 import random
 pygame.init()
 screen = pygame.display.set_mode((800,600))
-
-
 clock = pygame.time.Clock()
 fps = 60
+b=1
+def counter_round():
+	global b
+	b +=1
+	if b == 5:
+		print('Game Finished')
+
+
+class Write():
+	def __init__(self,color = None,font =(None,32),text = None):
+
+		self.text = text
+		self.color = color or ((255,255,255))
+		self.font = font
+
+	def round(self):
+		font = pygame.font.Font(self.font[0],self.font[1])
+		text = font.render('RAUND:' + str(b),True,self.color)
+		textRect = text.get_rect()
+		textRect.center = (85,50)
+		screen.blit(text,textRect)
+	def destroyed_balls(self):
+		font = pygame.font.Font(self.font[0],self.font[1])
+		text = font.render('Destroyed:' + str(b),True,self.color)
+		textRect = text.get_rect()
+		textRect.center = (85,70)
+		screen.blit(text,textRect)
 
 class puwka():
 	def __init__(self,x,y,color= None,left = False,right = False):
@@ -137,10 +162,18 @@ class Ball():
 		 	
 		 	self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
-pulya_object =Pulya(430,550)
+write_object = Write()
+pulya_object = Pulya(430,550)
 puwka_object = puwka(400,495)
+ 
+a = 10
+balls = [Ball(None,None) for i in range(a)]
 
-balls = [Ball(None,None) for i in range(8)]
+def new_raund():
+	global a
+	a +=1
+	for ball in range(a):
+	  balls.append(Ball(None,None))
 
 running = True
 
@@ -170,11 +203,18 @@ while running:
     ball.update()
 
     screen.blit(ball.image,(ball.x,ball.y))
-  
-  screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
-  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
 
-  
+
+  write_object.round()
+
+  screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
+  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y)) 
+
+  if len(balls) == 0:
+  	counter_round()  
+  	new_raund() 
+ 	
+  print(len(balls))
 
   pygame.display.flip()
 
