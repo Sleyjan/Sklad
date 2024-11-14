@@ -5,6 +5,7 @@ screen = pygame.display.set_mode((800,600))
 clock = pygame.time.Clock()
 fps = 60
 b=1
+counter = 0
 def counter_round():
 	global b
 	b +=1
@@ -25,12 +26,22 @@ class Write():
 		textRect = text.get_rect()
 		textRect.center = (85,50)
 		screen.blit(text,textRect)
+
 	def destroyed_balls(self):
 		font = pygame.font.Font(self.font[0],self.font[1])
-		text = font.render('Destroyed:' + str(b),True,self.color)
+		text = font.render('KILLED:' + str(counter),True,self.color)
 		textRect = text.get_rect()
 		textRect.center = (85,70)
 		screen.blit(text,textRect)
+
+	def totall_balls(self):
+		global a
+		font = pygame.font.Font(self.font[0],self.font[1])
+		text = font.render('BALLS:' + str(len(balls)),True,self.color)
+		textRect = text.get_rect()
+		textRect.center = (87,90)
+		screen.blit(text,textRect)
+
 
 class puwka():
 	def __init__(self,x,y,color= None,left = False,right = False):
@@ -90,17 +101,14 @@ class Pulya(puwka):
 			self.y = 550
 			self.Shoot = False
 
-
 	def pulya_border_control(self):
 		if self.x < 30:
 			self.x = 30
 		if self.x >750:
 			self.x = 750
 
-
-
 	def update(self):
-
+		global counter
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE:
 				self.Shoot = True
@@ -108,7 +116,7 @@ class Pulya(puwka):
 		for ball in balls:
 			if self.rect.colliderect(ball.rect):
 				balls.remove(ball)
-
+				counter +=1
 			   
 class Ball():
 	def __init__(self,x,y,color= None,rad=22):
@@ -123,7 +131,6 @@ class Ball():
 		self.image = pygame.Surface((self.rad * 2, self.rad * 2), pygame.SRCALPHA)
 
 		pygame.draw.circle(self.image, self.color, (self.rad, self.rad), self.rad)
-		
 
 		self.vx = random.randint(-5, 5)
 
@@ -138,28 +145,16 @@ class Ball():
 	def update(self):
         
 		 friction = 1 
-		 # self.vx *= friction 
 		 self.vy *= friction
-		 #self.x += self.vx
 		 self.y += self.vy
-        
-		 #if self.x < 0:
-		 #	self.x = 0
-		 	#self.vx = -self.vx
-		 #elif self.x + self.rad * 2 > 800:
-		 	#self.x = 800 - self.rad * 2
-		 #	self.vx = -self.vx
-
 		 if self.y == 0:
 		 	self.y = 0
 		 	self.vy = -self.vy
 		 elif self.y + self.rad * 2 > 600:
-
 		 	self.x = random.randint(self.rad, 800 - self.rad)
 		 	self.y = 600 - self.rad * 2
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
-		 	
 		 	self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
 write_object = Write()
@@ -204,8 +199,9 @@ while running:
 
     screen.blit(ball.image,(ball.x,ball.y))
 
-
+  write_object.destroyed_balls() 
   write_object.round()
+  write_object.totall_balls()
 
   screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
   screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y)) 
