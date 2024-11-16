@@ -20,24 +20,24 @@ class Sound():
 
 	def pulya_sound(self):
 		 	self.sound = pygame.mixer.Sound("pulya.mp3")
-		 	self.sound.set_volume(0.5)
+		 	self.sound.set_volume(0.1)
 		 	self.sound.play()
 
 	def destroyed_ball(self):
 		self.sound = pygame.mixer.Sound("puzir.mp3")
-		self.sound.set_volume(1)
+		self.sound.set_volume(0.1)
 		self.sound.play()
 
 	def new_raund_sound(self):
 
 		self.sound = pygame.mixer.Sound("smena1.mp3")
-		self.sound.set_volume(1)
+		self.sound.set_volume(0.1)
 		self.sound.play()
 
 	def move_object(self):
 
 		self.sound = pygame.mixer.Sound("move.mp3")
-		self.sound.set_volume(0.5)
+		self.sound.set_volume(0.1)
 		self.sound.play()
 
 class Write():
@@ -78,13 +78,11 @@ class puwka():
 		self.x = x
 		self.y = y 
 		if color == None:
-
 			color = ((255,0,0))
 		self.color = color
-
 		self.image = pygame.Surface((100,600),pygame.SRCALPHA)
-
 		pygame.draw.polygon(self.image, self.color, [[0 ,100], [35,50], [70,100]] )
+
 		self.speed = 30
 
 
@@ -104,6 +102,12 @@ class puwka():
 			if event.key == pygame.K_RIGHT:
 				self.x  += self.speed 
 				sound_object.move_object()
+
+	def update(self):
+		self.rect = pygame.Rect(self.x-10,self.y+50,self.image.get_width()-46,self.image.get_width())   
+		for ball in balls:
+			if self.rect.colliderect(ball.rect):
+				running = False
 
 class Pulya(puwka):
 	def __init__(self,x,y,color = None,rad=5,Shoot= False):
@@ -168,31 +172,32 @@ class Ball():
 
 		self.x = x if x and y else random.randint(self.rad, 800 - self.rad)
 
-		self.y = y if x and y else random.randint(self.rad, 600 - self.rad)
+		self.y = y if x and y else random.randint (self.rad,300 - self.rad)
 
 		self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
 	def update(self):
+
+		self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
         
-		 friction = 1 
-		 self.vy *= friction
-		 self.y += self.vy
-		 if self.y == 0:
+		friction = 1 
+		self.vy *= friction
+		self.y += self.vy
+		if self.y == 0:
 		 	self.y = 0
 		 	self.vy = -self.vy
-		 elif self.y + self.rad * 2 > 600:
+		elif self.y + self.rad * 2 > 600:
 		 	self.x = random.randint(self.rad, 800 - self.rad)
 		 	self.y = 600 - self.rad * 2
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
-		 	self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
 sound_object = Sound(None)
 write_object = Write()
-pulya_object = Pulya(430,550)
-puwka_object = puwka(400,495)
+pulya_object = Pulya(395,550)
+puwka_object = puwka(365,495)
  
-a = 10
+a = 5
 balls = [Ball(None,None) for i in range(a)]
 
 def new_raund():
@@ -210,14 +215,19 @@ while running:
     puwka_object.control()
     pulya_object.control()
     pulya_object.update()
-  for ball in balls:
-   	ball.update()
-  for ball in balls.copy():
-  	if pulya_object.rect.colliderect(ball.rect):
-  		counter +=1
-  		sound_object.destroyed_ball()
+    puwka_object.update()
 
-  		balls.remove(ball)
+  for ball in balls:
+   	
+   ball.update()
+   	
+   if pulya_object.rect.colliderect(ball.rect):
+  	 counter +=1
+  	 sound_object.destroyed_ball()
+  	 balls.remove(ball)
+  	
+   elif puwka_object.rect.colliderect(ball.rect):
+	     		running = False
 
   pulya_object.vistrel()
 
@@ -237,7 +247,7 @@ while running:
   write_object.totall_balls()
 
   screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
-  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y)) 
+  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))  
 
   if len(balls) == 0:
   	counter_round()  
