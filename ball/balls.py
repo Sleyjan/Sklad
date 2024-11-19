@@ -123,8 +123,9 @@ class Pulya(puwka):
 			color = ((0,0,0))
 		self.color = color
 		self.speed = 30
-		self.mvspeed = 25
+		self.mvspeed = 23
 		self.image = pygame.image.load("pulya.png")
+
 		
 	def vistrel(self):
 		if self.Shoot:
@@ -141,20 +142,22 @@ class Pulya(puwka):
 
 	def update(self):
 		global counter
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_SPACE:
-				self.Shoot = True
-				sound_object.pulya_sound()
-		self.rect = pygame.Rect(self.x,self.y,20,33)
+		self.rect = pygame.Rect(self.x,self.y+33,20,33)
 		for ball in balls:
 			if self.rect.colliderect(ball.rect):
 				print('tegdi')
 				balls.remove(ball)
 				counter +=1
 				sound_object.destroyed_ball()
+				self.y = 660
+		
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_SPACE:
+				self.Shoot = True
+				sound_object.pulya_sound()		
 			   
 class Ball():
-	def __init__(self,x,y,color= None,rad=22):
+	def __init__(self,x,y,color= None,rad=27):
 		self.rad = rad
 		if color == None:
 			color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
@@ -176,7 +179,7 @@ class Ball():
 		 	self.y = 0
 		 	self.vy = -self.vy
 		elif self.y + self.rad * 2 > 630:
-		 	self.x = random.randint(self.rad, 800 - self.rad)
+		 	self.x = random.randint(self.rad, 780 - self.rad*2)
 		 	self.y = 600 - self.rad * 2
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
@@ -223,11 +226,12 @@ while running:
   pulya_object.pulya_border_control()
 
   screen.blit(background_image,(0,0))
-  screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
-  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
   for ball in balls:
     ball.update()
     screen.blit(ball.image,(ball.x,ball.y)) 
+
+  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
+  screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
 
   write_object.destroyed_balls() 
   write_object.round()
