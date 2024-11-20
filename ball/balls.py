@@ -17,7 +17,7 @@ def play_background_music():
 
 class Sound():
 	def __init__(self,sound):
-		self.sound = sound
+		self.sound = sound  
 
 	def pulya_sound(self):
 		 	self.sound = pygame.mixer.Sound("pulya.mp3")
@@ -149,7 +149,7 @@ class Pulya(puwka):
 				print('tegdi')
 				balls.remove(ball)
 				counter +=1
-				self.y = 660
+			
 		
 	def	shoot_bullet(self):
 		if event.type == pygame.KEYDOWN:
@@ -211,6 +211,7 @@ while running:
     		 elif event.key == pygame.K_n:
     				running = False 
     pulya_object.shoot_bullet()
+  	
   pulya_object.update()
   puwka_object.control()
   pulya_object.control()
