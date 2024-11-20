@@ -12,7 +12,7 @@ def counter_round():
 	b +=1
 	fps +=3  
 def play_background_music():
-    pygame.mixer.music.load("fon2.WAV")
+    pygame.mixer.music.load("fon4.WAV")
     pygame.mixer.music.play(-1)  
 
 class Sound():
