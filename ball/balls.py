@@ -1,16 +1,21 @@
 import pygame
 import random
+import math
 pygame.init()
 screen = pygame.display.set_mode((800,600))
 clock = pygame.time.Clock()
 fps = 45
 b=1
+colidion = False
+health = 0
 counter = 0
 background_image = pygame.image.load("bg.png")
+
 def counter_round():
 	global b,fps
-	b +=1
-	fps +=3  
+	if stop ==True:
+		b +=1
+		fps +=3  
 def play_background_music():
     pygame.mixer.music.load("fon4.WAV")
     pygame.mixer.music.play(-1)  
@@ -64,16 +69,17 @@ class Write():
 		textRect.center = (87,90)
 		screen.blit(text,textRect)
 
-	def paused(self):
+	def health_puwka(self):
+		 global health
 		 font = pygame.font.Font(self.font[0],self.font[1] )
-		 text = font.render("You Lose !", True, 'red')
+		 text = font.render("Health: "+str(math.floor(health)), True, self.color)
 		 textRect = text.get_rect()
-		 textRect.center = (400,300)
+		 textRect.center = (85,110)
 		 screen.blit(text,textRect)
 
-	def retry(self):
-		font = pygame.font.Font(self.font[0],self.font[1] )
-		text = font.render('Retry: Press /Y   Exit : /N' , True, 'green')
+	def Game_over(self):
+		font = pygame.font.Font(None,72 )
+		text = font.render('GAME OVER :/' , True, 'red')
 		textRect = text.get_rect()
 		textRect.center = (400,330)
 		screen.blit(text,textRect)
@@ -96,26 +102,28 @@ class puwka():
 		elif self.x + self.image.get_width() > 800:
 			self.x = 805 - self.image.get_width()
 
-	def control(self):
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_LEFT:
+	def control_left(self):
 				self.x -=  self.speed
-			if event.key == pygame.K_RIGHT:
-				self.x  += self.speed 
-				
-
+	def control_right(self):
+			
+				self.x  += self.speed 			
 	def update(self):
-		global paused
+
+		global health,colidion
 		self.rect = pygame.Rect(self.x,self.y+50,60,50)
 		for ball in balls:
 			if self.rect.colliderect(ball.rect):
 				sound_object.game_over()
-				paused = True
+				fps =1
+				if not  colidion:
+					colidion = True
+					health += 0.01
+				else:
+					colidion = False
 
 class Pulya(puwka):
 	def __init__(self,x,y,color = None,Shoot= False):
-		super().__init__(x,y,color,Shoot)
-
+		super().__init__(self,x,y)
 		self.x = x 
 		self.y = y 
 		self.Shoot = Shoot
@@ -148,12 +156,11 @@ class Pulya(puwka):
 				sound_object.destroyed_ball()
 				print('tegdi')
 				balls.remove(ball)
-				counter +=1
+				if stop == True:
+					counter +=1
 			
 		
 	def	shoot_bullet(self):
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_SPACE:
 				self.Shoot = True
 				sound_object.pulya_sound()		
 			   
@@ -185,71 +192,84 @@ class Ball():
 		 	self.y = self.rad /100
 		 	self.vy = +self.vy
 
+class draw():
+	def __init__(self):
+		pass
+
+	def draw_objects(self):
+		global health
+		screen.blit(background_image,(0,0))
+		for ball in balls:
+		  ball.update()
+		  screen.blit(ball.image,(ball.x,ball.y))
+		screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
+		screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
+		write_object.destroyed_balls()
+		write_object.round()
+		write_object.totall_balls()
+		write_object.health_puwka()
+		if health >=5:
+			write_object.Game_over()
+
+
+class MainLoop(Pulya,puwka,Ball):
+	def __init__(self,x,y,color=None,event=None):
+		super().__init__(x,y,color,event)
+	def menenger(self):
+		global fps,health,stop
+		running = True
+		while running:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					running = False
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_SPACE:
+						pulya_object.shoot_bullet()
+				
+			if event.type == pygame.KEYDOWN:			
+					if event.key == pygame.K_LEFT:
+						puwka_object.control_left()
+						pulya_object.control_left()
+					if event.key == pygame.K_RIGHT:
+						puwka_object.control_right()
+						pulya_object.control_right()
+			for ball in balls:
+					ball.update()
+					puwka_object.update()
+					pulya_object.update()
+			pulya_object.vistrel()
+			puwka_object.border_control()
+			pulya_object.pulya_border_control()
+			if health >=5:
+				stop = False
+				balls.clear()
+			draw1.draw_objects()
+			if len(balls) == 0 and stop == True:
+				counter_round()
+				new_raund()
+				sound_object.new_raund_sound()
+			
+			pygame.display.flip()
+			clock.tick(fps)
+
+
+draw1 = draw()
 sound_object = Sound(None)
 write_object = Write()
 pulya_object = Pulya(400 ,660)
 puwka_object = puwka(365,510)
+MainLoop1 =MainLoop(None,None)
+stop = True
 a = 8
 balls = [Ball(None,None) for i in range(a)]
 def new_raund():
-	global a
-	a +=1
-	for ball in range(a):
-	  balls.append(Ball(None,None))
-paused = False
+	global a,stop
+	if stop == True:
+		a +=1
+		for ball in range(a):
+			balls.append(Ball(None,None))
+
 play_background_music()
-running = True
-while running:
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      running = False 
-    elif event.type == pygame.KEYDOWN:
-    	if paused:
-    		 if event.key == pygame.K_y:
-     				paused = False
-     				fps =45
-    		 elif event.key == pygame.K_n:
-    				running = False 
-    pulya_object.shoot_bullet()
-  	
-  pulya_object.update()
-  puwka_object.control()
-  pulya_object.control()
-  pulya_object.vistrel()
-  puwka_object.border_control()
-  pulya_object.pulya_border_control()
-  for ball in balls:
-  	ball.update()
 
-
-  screen.blit(background_image,(0,0))
-   
-  if puwka_object.update():
-
-	     		paused = True
-  
-  for ball in balls:
-    ball.update()
-    screen.blit(ball.image,(ball.x,ball.y)) 
-
-  screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
-  screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
-
-  write_object.destroyed_balls() 
-  write_object.round()
-  write_object.totall_balls()
-  if paused:
-  	write_object.paused()
-  	write_object.retry()
-  	fps=5
-   
-  if len(balls) == 0:
-  	counter_round()  
-  	new_raund() 
-  	sound_object.new_raund_sound()
-
-  pygame.display.flip()
-
-  clock.tick(fps)
-
+MainLoop1.menenger()
 pygame.quit()
