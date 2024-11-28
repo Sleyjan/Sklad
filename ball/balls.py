@@ -11,8 +11,39 @@ health = 0
 counter = 0
 bombed = 0
 background_image = pygame.image.load("bg1.png")
-x_find = 0
-x_find1 = 365
+fly = False
+bomb = False
+
+class Heart():
+	def __init__(self,x,y):
+		self.x = x
+		self.y = y
+		self.image = pygame.image.load("heart1.png")
+
+	def photo_heart(self):
+		screen.blit(self.image,(self.x,self.y))
+
+	
+
+def fly_control():
+	global fly,bomb
+	if fly == True:
+		sound_object.fly_sound()
+		fly1.move_fly()
+		bomb = True
+		if fly1.x >=820:
+			fly1.x = -200
+			fly = False
+def bomb_control():
+	global bomb
+	if bomb == True:
+		bomb1.move()
+
+		if bomb1.y + bomb1.image.get_width() >=950:
+			sound_object.boom()
+			bomb1.y = 0
+			bomb1.x = 0
+			bomb = False			
 
 def counter_round():
 	global b,fps
@@ -20,12 +51,16 @@ def counter_round():
 		b +=1
 		fps +=3  
 def play_background_music():
-    pygame.mixer.music.load("fonnmusik.WAV")
+    pygame.mixer.music.load("fonnmusik1.WAV")
     pygame.mixer.music.play(-1)  
 
 class Sound():
 	def __init__(self,sound):
 		self.sound = sound  
+	def boom(self):
+			self.sound = pygame.mixer.Sound("boom.WAV")
+			self.sound.set_volume(1)
+			self.sound.play()
 
 	def fly_sound(self):
 		 	self.sound = pygame.mixer.Sound("fly.WAV")
@@ -51,7 +86,7 @@ class Sound():
 class Write():
 	def __init__(self,color = None,font =(None,32),text = None):
 		self.text = text
-		self.color = color or ((25,100,255))
+		self.color = color or ((255,255,255))
 		self.font = font
 
 	def round(self):
@@ -65,7 +100,7 @@ class Write():
 		font = pygame.font.Font(self.font[0],self.font[1])
 		text = font.render('SCORE:' + str(counter),True,self.color)
 		textRect = text.get_rect()
-		textRect.center = (85,70)
+		textRect.center = (85,80)
 		screen.blit(text,textRect)
 
 	def totall_balls(self):
@@ -73,15 +108,15 @@ class Write():
 		font = pygame.font.Font(self.font[0],self.font[1])
 		text = font.render('BALLS:' + str(len(balls)),True,self.color)
 		textRect = text.get_rect()
-		textRect.center = (87,90)
+		textRect.center = (85,110)
 		screen.blit(text,textRect)
 
 	def health_puwka(self):
 		 global health
-		 font = pygame.font.Font(self.font[0],self.font[1] )
-		 text = font.render("TOUCH Bomb: "+str(math.floor(bombed)), True, 'red')
+		 font = pygame.font.Font(None,42 )
+		 text = font.render(" = "+str(3-math.floor(bombed)), True, 'red')
 		 textRect = text.get_rect()
-		 textRect.center = (700,50)
+		 textRect.center = (666,73)
 		 screen.blit(text,textRect)
 
 	def Game_over(self):
@@ -99,36 +134,38 @@ class FLYER():
 		self.speed = speed
 		self.rect = pygame.Rect(self.x,self.y,150,150)
 	def move_fly(self): 
-		self.x += self.speed
-			
+		self.x += self.speed		
 
 	def return_back(self):
-	  self.x = -200
+			self.x = -200
 
 class Bomb(FLYER):
 	def __init__(self,x,y,speed = 10):
 		super().__init__(x,y,speed)
 
 		self.x = x
+		x = fly1.x
 		self.y = y
+		y = fly1.y
 		self.speed = speed  
 		self.image=pygame.image.load("bomb1.png")
-		self.rect = pygame.Rect(self.x,self.y+65,65,65) 
+		self.rect = pygame.Rect(self.x,self.y,80,80) 
+		self.image1 = pygame.image.load("boom.png")
 
 	def draw(self):
 		screen.blit(self.image,(self.x,self.y))
+	def draw1(self):
+		screen.blit(self.image1,(self.x,self.y))
 
 	def move(self):
-		if puwka_object.rect.x < 400:
-			self.y += self.speed*2
-			self.x = fly1.x*0.5 
+		if puwka_object.rect.x <400:
+			self.x += self.speed*0.5
+			self.y += self.speed*1.2
 		else:
-			self.y += self.speed
-			self.x = fly1.x*0.5
+			self.x += self.speed
+			self.y += self.speed*0.8
 
-	def return_back(self):	
-			if self.y + self.image.get_width() >600:
-				self.y = fly1.y
+
 	def update(self):
 		global stop,bombed
 		self.rect = pygame.Rect(self.x,self.y,50,50)
@@ -137,7 +174,6 @@ class Bomb(FLYER):
 			if bombed >= 3:
 				stop = False
 				balls.clear()
-				print('portladi')
 
 
 class puwka():
@@ -166,22 +202,17 @@ class puwka():
 		
 	def update(self):
 
-		global health,colidion
+		global health,colidion,fly,bomb
 		self.rect = pygame.Rect(self.x,self.y+50,60,50)
 		for ball in balls:
 			if self.rect.colliderect(ball.rect):
+				fly = True
 				sound_object.game_over()
+				colidion= True
 				fps =1
-				if not  colidion:
-					colidion = True
-					health += 0.017
-					fly1.move_fly()
-					sound_object.fly_sound()
-					bomb1.move()
-				else:
-					colidion = False
-					fly1.return_back()
-					bomb1.return_back()
+				#bomb = True
+			else:
+				colidion = False
 
 class Pulya():
 	def __init__(self,x,y,color = None,Shoot= False,speed =8):
@@ -220,12 +251,10 @@ class Pulya():
 		for ball in balls:
 			if self.rect.colliderect(ball.rect):
 				sound_object.destroyed_ball()
-				print('tegdi')
+
 				balls.remove(ball)
 				if stop == True:
 					counter +=1
-			
-		
 	def	shoot_bullet(self):
 				self.Shoot = True
 				sound_object.pulya_sound()		
@@ -240,7 +269,7 @@ class Ball():
 		pygame.draw.circle(self.image, self.color, (self.rad, self.rad), self.rad)
 		self.vx = random.randint(-5, 5)
 		self.vy = random.randint(1,   2)
-		self.x = x if x and y else random.randint(self.rad, 800 - self.rad)
+		self.x = x if x and y else random.randint(self.rad, 775 - self.rad)
 		self.y = y if x and y else random.randint (self.rad,300 - self.rad)
 		self.rect = pygame.Rect(self.x,self.y,self.rad*2,self.rad*2)
 
@@ -263,7 +292,7 @@ class draw():
 		pass
 
 	def draw_objects(self):
-		global health
+		global health,colidion
 		screen.blit(background_image,(0,0))
 		for ball in balls:
 		  ball.update()
@@ -271,24 +300,28 @@ class draw():
 		screen.blit(pulya_object.image,(pulya_object.x,pulya_object.y))
 		screen.blit(puwka_object.image,(puwka_object.x,puwka_object.y))
 		screen.blit(fly1.image,(fly1.x,fly1.y))
+		Heart1.photo_heart()
+
 		write_object.destroyed_balls()
 		write_object.round()
 		write_object.totall_balls()
 		write_object.health_puwka()
+
 		if bombed >=3:
 			write_object.Game_over()
 		if fly1.x >= puwka_object.rect.x:
 			bomb1.draw()
-			bomb1.move()
 
+		if bomb1.rect.y >=400 and bomb1.rect.y <=550:
+				bomb1.draw1()
 
-class MainLoop(Pulya,puwka,Ball):
+class MainLoop():
 	def __init__(self,x,y,color=None,event=None):
 		self.x = x
 		self.y = y
 
 	def menenger(self):
-		global fps,health,stop,bombed
+		global fps,health,stop,bombed,bomb
 		running = True
 		while running:
 			for event in pygame.event.get():
@@ -306,12 +339,12 @@ class MainLoop(Pulya,puwka,Ball):
 					if event.key == pygame.K_RIGHT:
 						puwka_object.control_right()
 						pulya_object.control_right()
+
 			
 			for ball in balls:
 					ball.update()
 					pulya_object.update()
 					puwka_object.update()
-		
 			bomb1.update()
 			pulya_object.vistrel()
 			puwka_object.border_control()
@@ -319,8 +352,8 @@ class MainLoop(Pulya,puwka,Ball):
 			if bombed >=3:
 				stop = False
 				balls.clear()
-
-			fly1.move_fly()
+			fly_control()
+			bomb_control()
 
 			if len(balls) == 0 and stop == True:
 				counter_round()
@@ -329,16 +362,18 @@ class MainLoop(Pulya,puwka,Ball):
 			draw1.draw_objects()		
 			pygame.display.flip()
 			clock.tick(fps)
+
+Heart1 = Heart(600,50)
 fly1 = FLYER(-200,100,20)
 draw1 = draw()
 sound_object = Sound(None)
 write_object = Write()
 pulya_object = Pulya(385 ,660)
 puwka_object = puwka(365,510)
-bomb1 = Bomb(0,fly1.y,10)
+bomb1 = Bomb(0,0,12)
 MainLoop1 =MainLoop(None,None)
 stop = True
-a = 1
+a = 8
 balls = [Ball(None,None) for i in range(a)]
 def new_raund():
 	global a,stop
