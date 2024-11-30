@@ -22,9 +22,6 @@ class Heart():
 
 	def photo_heart(self):
 		screen.blit(self.image,(self.x,self.y))
-
-	
-
 def fly_control():
 	global fly,bomb
 	if fly == True:
