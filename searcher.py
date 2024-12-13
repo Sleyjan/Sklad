@@ -23,7 +23,6 @@ class WorkerThread(QThread):
         self.total_matches = 0
 
     def run(self):
-        print(self.files)
         processed_files = []
         for file in self.files:
             results = []  # Список для хранения результатов по файлу
@@ -34,11 +33,10 @@ class WorkerThread(QThread):
                     if str(self.keyword).lower() in str(cell.value).lower(): # Поиск с учетом регистра
                         results.append(f"{file} -- {'--'.join(str(cell.value) for cell in row[0:5])}")
                         self.total_matches += 1
-                        print(self.total_matches)
-                        print('--'.join(str(cell.value) for cell in row[0:5]))
 
 
             processed_files.append(results)
+
         self.total_matches_changed.emit(self.total_matches)
         self.results.emit(processed_files)  # Выдаем список результатов
         self.finished.emit()
@@ -118,7 +116,9 @@ class MyApp(QWidget):
 
 
     def on_result(self, processed_files):
-        result_text = "\n".join(item for sublist in processed_files for item in sublist)  # Объединить все результаты
+        result_text = "\n".join(item for sublist in processed_files for item in sublist)
+        result_text = "\n".join(result.split("/")[-1] for result in result_text.splitlines())
+        print(result_text)
         self.label.setText(result_text)
         if len(result_text) == 0:
             self.label.setText('Нет совподаемых слов !!!')
@@ -128,7 +128,7 @@ class MyApp(QWidget):
         x = size.width()
         y = size.height()
 
-        # Делаем нижний правый угол видимым
+        # Делаем нижний правый угол видимымre
         self.scroll_area.ensureVisible(x, y)
 
 
