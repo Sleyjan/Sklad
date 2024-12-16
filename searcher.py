@@ -3,7 +3,7 @@ import os
 from importlib.resources import files
 from itertools import count
 from platform import system
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLineEdit, QVBoxLayout, QLabel,QScrollArea
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLineEdit, QVBoxLayout, QLabel,QScrollArea,QTextEdit
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 
@@ -54,8 +54,11 @@ class MyApp(QWidget):
     def initUI(self):
         self.btn = QPushButton('Открыть', self)
         self.btn1 = QPushButton('Поиск', self)
+        self.btn_save = QPushButton('Сохранить', self)
         self.btn.move(5, 20)
         self.btn1.move(5, 100)
+        self.btn_save.move(5,50)
+
         self.label = QLabel("Гатов к поиску")
         self.label.setStyleSheet("color: green;")
         font_label = QFont()
@@ -69,6 +72,7 @@ class MyApp(QWidget):
         font_scrol_area.setPointSize(16)
 
         self.textbox = QLineEdit()
+        self.text_edit = QTextEdit()
         self.scroll_area = QScrollArea()
         self.scroll_area.setFont(font_scrol_area)
         self.scroll_area.setWidgetResizable(True)
@@ -80,9 +84,9 @@ class MyApp(QWidget):
         layout.addWidget(self.textbox, alignment=Qt.AlignTop | Qt.AlignRight)
         layout.addWidget(self.label, Qt.AlignLeft | Qt.AlignTop)
         layout.addWidget(self.label_1, Qt.AlignCenter | Qt.AlignCenter)
-        layout.addWidget(self.scroll_area,alignment=Qt.AlignTop)
+        layout.addWidget(self.scroll_area, Qt.AlignTop | Qt.AlignLeft )
         self.label = QLabel()
-        self.scroll_area.setWidget(self.label)
+        self.scroll_area.setWidget(self.text_edit)
         self.textbox.setFixedSize(300, 30)
         self.setLayout(layout)
         self.btn.clicked.connect(self.showDialog)
@@ -114,16 +118,14 @@ class MyApp(QWidget):
     def on_finished(self):
         print("Обработка файлов завершена")
 
-
     def on_result(self, processed_files):
         result_text = "\n".join(item for sublist in processed_files for item in sublist)
         result_text = "\n".join(result.split("/")[-1] for result in result_text.splitlines())
         print(result_text)
-        self.label.setText(result_text)
+
+        self.text_edit.setText(result_text)
         if len(result_text) == 0:
-            self.label.setText('Нет совподаемых слов !!!')
-        #self.label.setText(f"Найдено соваодений : {self.total_matches}")
-        # Получаем размер виджета и определяем позицию нижнего правого угла
+            self.label.setText('Нет совпадающих слов !!!')
         size = self.label.sizeHint()
         x = size.width()
         y = size.height()
